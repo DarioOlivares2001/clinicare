@@ -1,0 +1,66 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 50px;
+  }
+  
+  .main-container {
+    padding: 20px;
+  }
+  
+  button {
+    padding: 10px 20px;
+    margin: 10px;
+    border: none;
+    background-color: #5762ff;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  
+  button:hover {
+    background-color: #641958;
+  }
+  
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  li {
+    margin: 5px 0;
+    cursor: pointer;
+    color: #0078d4;
+  }
+  
+  li:hover {
+    text-decoration: underline;
+  }
+  
+  .logout-button {
+    float: right;
+    background-color: #d9534f;
+  }
+  
+  .logout-button:hover {
+    background-color: #c9302c;
+  }
+  
+  .custom-header {
+    background-color: #5801e4; /* Cambia este valor al color deseado */
+    color: white; /* Asegúrate de que el texto sea visible */
+    border-bottom: 2px solid #0056b3; /* Agrega un borde decorativo si lo deseas */
+  }
+  
+  .custom-header .title-font {
+    font-size: 1.5rem;
+    color: #ffffff; /* Cambia el color del texto */
+  }
+  
