@@ -206,11 +206,9 @@ export class AppComponent implements OnInit {
           type: 'Ritmo Cardíaco',
           value: Math.floor(Math.random() * (120 - 60 + 1)) + 60,
           timestamp: new Date().toISOString(),
-          patientId: this.selectedPatientId, // Incluye el ID del paciente
         };
-  
-        // Envía el nuevo signo vital al backend
-        this.sendVitalSignToBackend(newVitalSign);
+        this.vitalSigns.push(newVitalSign);
+        this.initializeChart();
       }
     });
   }

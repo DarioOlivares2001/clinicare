@@ -69,7 +69,7 @@
       <div class="row">
         <!-- Pacientes -->
         <div class="col-md-3 border-end" style="max-height: 80vh; overflow-y: auto;">
-          <h4 class="text-secondary">Pacientes</h4>
+          <h1 class="text-secondary">Pacientes</h1>
           <ul class="list-group">
             <li
               *ngFor="let patient of patients"
@@ -82,6 +82,17 @@
             </li>
           </ul>
         </div>
+
+        <!-- Señales Vitales -->
+        <div class="card mt-4">
+            <div class="card-body">
+            <h2 class="card-title text-center">Señales Vitales</h2>
+            <div style="max-width: 700px; max-height: 400px; margin: auto;">
+                <canvas id="vitalSignsChart"></canvas>
+            </div>
+            </div>
+        </div>
+
   
         <!-- Panel Central -->
         <div class="col-md-9">
@@ -97,15 +108,7 @@
               </ul>
             </div>
   
-            <!-- Señales Vitales -->
-            <div class="card mt-4">
-                <div class="card-body">
-                  <h4 class="card-title text-center">Señales Vitales</h4>
-                  <div style="max-width: 700px; max-height: 400px; margin: auto;">
-                    <canvas id="vitalSignsChart"></canvas>
-                  </div>
-                </div>
-              </div>
+          
 
 
           </div>
