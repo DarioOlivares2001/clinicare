@@ -58,6 +58,7 @@ export class AppComponent implements OnInit {
     }
   }
 
+
   login() {
     this.msalService
       .loginPopup({
@@ -207,9 +208,33 @@ export class AppComponent implements OnInit {
           value: Math.floor(Math.random() * (120 - 60 + 1)) + 60,
           timestamp: new Date().toISOString(),
         };
+
+        // Envía la nueva señal vital al backend
+        this.sendVitalSignToBackend(newVitalSign);
+
+        // Actualiza la gráfica localmente
         this.vitalSigns.push(newVitalSign);
         this.initializeChart();
       }
+    });
+  }
+
+
+  sendVitalSignToBackend(vitalSign: any) {
+    const apiUrl = 'https://yzugk60fk4.execute-api.us-east-1.amazonaws.com/senales-vitales';
+
+    const headers = new HttpHeaders({
+      Authorization: this.accessToken || '',
+      'Content-Type': 'application/json',
+    });
+
+    this.http.post(apiUrl, vitalSign, { headers }).subscribe({
+      next: (response) => {
+        console.log('Señal vital enviada con éxito:', response);
+      },
+      error: (error) => {
+        console.error('Error al enviar la señal vital:', error);
+      },
     });
   }
 
@@ -245,26 +270,12 @@ export class AppComponent implements OnInit {
     });
   }
 
-  sendVitalSignToBackend(vitalSign: any) {
-    const apiUrl = `https://yzugk60fk4.execute-api.us-east-1.amazonaws.com/senales-vitales`;
-    
-    const headers = new HttpHeaders({
-      Authorization: this.accessToken || '',
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    });
   
-    this.http.post(apiUrl, vitalSign, { headers }).subscribe({
-      next: (response: any) => {
-        console.log('Signo vital enviado al backend:', response);
-        // Actualiza los signos vitales locales después de un envío exitoso
-        this.vitalSigns.push(response);
-        this.initializeChart();
-      },
-      error: (error) => {
-        console.error('Error al enviar signo vital:', error);
-      },
-    });
+
+
+  getPatientName(patientId: number): string {
+    const patient = this.patients.find((p) => p.id === patientId);
+    return patient ? patient.name : 'Desconocido';
   }
 
 }

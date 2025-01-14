@@ -20,7 +20,7 @@
         <nav class="md:ml-auto md:mr-auto flex flex-wrap items-center text-base justify-center">
             <!-- Placeholder for navigation links -->
         </nav>
-        <button class=""
+        <button
             *ngIf="!isLoggedIn"
             class="inline-flex items-center bg-gray-100 border-0 py-1 px-3 focus:outline-none hover:bg-gray-200 rounded text-base mt-4 md:mt-0"
             (click)="login()"
@@ -58,62 +58,65 @@
         </button>
     </div>
 </header>
-  
-  <div class="container-fluid my-4">
+
+<div class="container-fluid my-4">
     <div *ngIf="!isLoggedIn" class="login-container text-center">
-      <h2 class="mb-4">Bienvenido a Clinicare</h2>
-      <!-- Este botón ahora está en el header -->
+        <h2 class="mb-4">Bienvenido a Clinicare</h2>
     </div>
-  
+
     <div *ngIf="isLoggedIn" class="main-container">
-      <div class="row">
-        <!-- Pacientes -->
-        <div class="col-md-3 border-end" style="max-height: 80vh; overflow-y: auto;">
-          <h1 class="text-secondary">Pacientes</h1>
-          <ul class="list-group">
-            <li
-              *ngFor="let patient of patients"
-              class="list-group-item list-group-item-action"
-              (click)="selectPatient(patient.id)"
-              [class.active]="selectedPatientId === patient.id"
-              style="cursor: pointer;"
-            >
-              {{ patient.name }} (ID: {{ patient.id }})
-            </li>
-          </ul>
-        </div>
-
         <!-- Señales Vitales -->
-        <div class="card mt-4">
+        <div class="card mb-4">
             <div class="card-body">
-            <h2 class="card-title text-center">Señales Vitales</h2>
-            <div style="max-width: 700px; max-height: 400px; margin: auto;">
-                <canvas id="vitalSignsChart"></canvas>
-            </div>
+                <h2 class="card-title text-center">
+                    Señales Vitales
+                    <span *ngIf="selectedPatientId" class="text-muted">
+                        - {{ getPatientName(selectedPatientId) }}
+                    </span>
+                </h2>
+                <div style="max-width: 700px; max-height: 400px; margin: auto;">
+                    <canvas id="vitalSignsChart"></canvas>
+                </div>
             </div>
         </div>
 
-  
-        <!-- Panel Central -->
-        <div class="col-md-9">
-          <div class="row">
-            <!-- Alertas -->
-            <div class="col-md-6 mb-4">
-              <h4 class="text-secondary">Alertas</h4>
-              <ul class="list-group" style="max-height: 35vh; overflow-y: auto;">
-                <li *ngFor="let alert of alerts" class="list-group-item">
-                  <strong>{{ alert.alertType }}:</strong> {{ alert.status }}
-                  <span class="text-muted">({{ alert.timestamp }})</span>
-                </li>
-              </ul>
+        <div class="row">
+            <!-- Pacientes -->
+            <div class="col-md-3 border-end" style="max-height: 80vh; overflow-y: auto;">
+                <h1 class="text-secondary">Pacientes</h1>
+                <ul class="list-group">
+                    <li
+                        *ngFor="let patient of patients"
+                        class="list-group-item list-group-item-action"
+                        (click)="selectPatient(patient.id)"
+                        [class.active]="selectedPatientId === patient.id"
+                        style="cursor: pointer;"
+                    >
+                        {{ patient.name }} (ID: {{ patient.id }})
+                    </li>
+                </ul>
             </div>
-  
-          
 
-
-          </div>
+            <!-- Panel Central -->
+            <div class="col-md-9">
+                <div class="row">
+                    <!-- Alertas -->
+                    <div class="col-md-12">
+                        <h4 class="text-secondary">
+                            Alertas
+                            <span *ngIf="selectedPatientId" class="text-muted">
+                                - {{ getPatientName(selectedPatientId) }}
+                            </span>
+                        </h4>
+                        <ul class="list-group" style="max-height: 35vh; overflow-y: auto;">
+                            <li *ngFor="let alert of alerts" class="list-group-item">
+                                <strong>{{ alert.alertType }}:</strong> {{ alert.status }}
+                                <span class="text-muted">({{ alert.timestamp }})</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
-  
+</div>
