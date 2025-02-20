@@ -46,6 +46,7 @@ export class AppComponent implements OnInit {
 
   chart: Chart | null = null;
   updateSubscription: Subscription | null = null;
+  alertsUpdateSubscription: Subscription | null = null;  // Nueva propiedad
 
   constructor(private msalService: MsalService, private http: HttpClient) {}
 
@@ -201,40 +202,84 @@ export class AppComponent implements OnInit {
   }
 
   startUpdatingVitalSigns() {
-    this.updateSubscription = interval(30000).subscribe(() => {
+    // Cambiamos el intervalo de 30000 (30 segundos) a 5000 (5 segundos)
+    this.updateSubscription = interval(5000).subscribe(() => {
       if (this.selectedPatientId) {
+        const currentTimestamp = new Date().toISOString();
+        
+        // Aumentamos la probabilidad de valores críticos a 50%
+        const randomFactor = Math.random();
+        
+        let heartRate;
+        if (randomFactor < 0.5) { // 50% de probabilidad de valores críticos
+          // Generamos valores más altos, entre 150 y 180
+          heartRate = Math.floor(Math.random() * (180 - 150 + 1)) + 150;
+        } else {
+          // Valores normales entre 60 y 100
+          heartRate = Math.floor(Math.random() * (100 - 60 + 1)) + 60;
+        }
+
         const newVitalSign = {
-          type: 'Ritmo Cardíaco',
-          value: Math.floor(Math.random() * (120 - 60 + 1)) + 60,
-          timestamp: new Date().toISOString(),
+          patientId: this.selectedPatientId,
+          type: 'Pulsaciones',
+          value: heartRate,
+          timestamp: currentTimestamp
         };
 
-        // Envía la nueva señal vital al backend
         this.sendVitalSignToBackend(newVitalSign);
-
-        // Actualiza la gráfica localmente
         this.vitalSigns.push(newVitalSign);
         this.initializeChart();
+        
+        console.log(`Nueva lectura de pulsaciones: ${heartRate} bpm`);
+        if (heartRate > 140) {
+          console.warn('¡Alerta! Pulsaciones elevadas detectadas');
+        }
       }
     });
-  }
+}
 
 
   sendVitalSignToBackend(vitalSign: any) {
-    const apiUrl = 'https://yzugk60fk4.execute-api.us-east-1.amazonaws.com/senales-vitales';
+    const apiUrl = 'https://yzugk60fk4.execute-api.us-east-1.amazonaws.com/signos';
 
     const headers = new HttpHeaders({
-      Authorization: this.accessToken || '',
       'Content-Type': 'application/json',
+      'Authorization': this.accessToken || ''
     });
 
-    this.http.post(apiUrl, vitalSign, { headers }).subscribe({
+    // Aseguramos que el objeto tenga el formato correcto
+    const formattedVitalSign = {
+      patientId: vitalSign.patientId,
+      type: vitalSign.type,
+      value: vitalSign.value,
+      timestamp: vitalSign.timestamp
+    };
+
+    this.http.post(apiUrl, formattedVitalSign, { headers }).subscribe({
       next: (response) => {
         console.log('Señal vital enviada con éxito:', response);
       },
       error: (error) => {
-        console.error('Error al enviar la señal vital:', error);
+        if (error.status === 200) {
+          console.warn('El servidor respondió con 200 OK, pero Angular lo detectó como error. Ignorando...');
+        } else {
+          console.error('Error al enviar la señal vital:', error);
+        }
       },
+    });
+  }
+
+  startUpdatingAlerts() {
+    // Cancelar la suscripción anterior si existe
+    if (this.alertsUpdateSubscription) {
+      this.alertsUpdateSubscription.unsubscribe();
+    }
+
+    // Crear nueva suscripción para actualizar cada 5 segundos
+    this.alertsUpdateSubscription = interval(5000).subscribe(() => {
+      if (this.selectedPatientId) {
+        this.fetchAlerts();
+      }
     });
   }
 
@@ -243,6 +288,7 @@ export class AppComponent implements OnInit {
     this.fetchVitalSigns();
     this.fetchAlerts();
     this.startUpdatingVitalSigns();
+    this.startUpdatingAlerts();
   }
 
   logout() {
@@ -258,6 +304,10 @@ export class AppComponent implements OnInit {
 
         if (this.updateSubscription) {
           this.updateSubscription.unsubscribe();
+        }
+
+        if (this.alertsUpdateSubscription) {
+          this.alertsUpdateSubscription.unsubscribe();
         }
 
         if (this.chart) {
@@ -276,6 +326,19 @@ export class AppComponent implements OnInit {
   getPatientName(patientId: number): string {
     const patient = this.patients.find((p) => p.id === patientId);
     return patient ? patient.name : 'Desconocido';
+  }
+
+  ngOnDestroy() {
+    // Importante: limpiar las suscripciones cuando el componente se destruye
+    if (this.updateSubscription) {
+      this.updateSubscription.unsubscribe();
+    }
+    if (this.alertsUpdateSubscription) {
+      this.alertsUpdateSubscription.unsubscribe();
+    }
+    if (this.chart) {
+      this.chart.destroy();
+    }
   }
 
 }
